@@ -1,4 +1,4 @@
-import UIKit
+import Cocoa
 
 var greeting: String;
 greeting = "Hello, playground" // semicolon(;) is not necessary
