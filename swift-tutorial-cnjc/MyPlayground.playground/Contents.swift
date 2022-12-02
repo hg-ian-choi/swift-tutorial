@@ -88,3 +88,13 @@ for x in 0...10 {
 }
 
 let theInput = readLine();
+
+
+
+/* ------------------------------------ typealias ------------------------------------ */
+// ex) typealias newname = type
+typealias Feet = Int;   // Feet = Int
+let feet: Feet = 100;   // 100
+print(feet);            // 100
+print(type(of: feet)); // => Int
+
