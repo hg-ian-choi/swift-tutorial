@@ -13,12 +13,12 @@ var hw = "Hello, World!"; print(hw)
 // one line comment
 
 /* multiple
-   line
-   comment */
+ line
+ comment */
 
 /* start of comment
-/* another comment */
-   end of comment */
+ /* another comment */
+ end of comment */
 
 
 
@@ -57,11 +57,14 @@ let b = 3+4 // => alse right
 
 
 /* ------------------------------------ variable type ------------------------------------ */
-let int = 42;                 // int
-let float = 3.1315926;        // float
-let string = "Hello, World!"; // string
-let boolean = true;           // boolean
-
+let int:Int = -42;                   // Integer (int)
+let uint:UInt = 42;                  // Unsigned Integer (uint)
+let float:Float = 3.14;              // float
+let double:Double = 3.1415926;       // double
+let string:String = "Hello, World!"; // string
+let bool:Bool = true;                // Boolean
+let character: Character = "C";      // character (char)
+let optional:Optional = {};          // Optional (include null and undefined)
 
 
 /* ------------------------------------ print ------------------------------------ */
