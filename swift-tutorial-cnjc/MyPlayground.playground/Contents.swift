@@ -98,3 +98,16 @@ let feet: Feet = 100;   // 100
 print(feet);            // 100
 print(type(of: feet)); // => Int
 
+
+
+/* ------------------------------------ type safe ------------------------------------ */
+var varA = 42;
+// varA = "Hello, World"; => error: Cannot assign value of type 'String' to type 'Int'
+
+/* ------------------------------------ type inference ------------------------------------ */
+let notDeclareType = 42;         // auto type => Int
+print(type(of: notDeclareType)); // Int
+let pi = 3.1415926;              // auto type => Double
+print(type(of: pi));             // Double
+var c = 3 + 0.1415926;           // auto type => Double
+print(type(of: c));              // Double
