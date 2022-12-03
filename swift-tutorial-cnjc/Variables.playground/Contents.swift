@@ -2,7 +2,6 @@ import Cocoa
 
 /* ------------------------------------ declare variable ------------------------------------ */
 // var variableName = <initial value>
-
 var varA = 0;
 print(varA);
 
@@ -25,4 +24,20 @@ print(你好);
 var firstName = "IAN";
 var lastName = "CHOI";
 print("\(firstName) \(lastName)");
+
+
+
+
+/* ------------------------------------ Optionals  ------------------------------------ */
+/* variable "optionalInteger" is "Optional Integer" type.
+   "Optional" type includes "None" and "Some<T>" types,
+   for express the variable which may exists or not. */
+// Both declarations are same
+var optionalInteger1: Int?;
+var optionalInteger2: Optional<Int>;
+
+var optionalIntArray: [Int]?;
+   
+
+
 
