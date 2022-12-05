@@ -158,3 +158,20 @@ print("K => \(K)");
 K |= I;
 print("K => \(K)");
 
+
+
+/* ------------------------------------ Interval Arithmetic Operator ------------------------------------ */
+/*
+ X:Integer
+ "Closed interval"    => [a, b]: a <= X <= b
+ "Semi open interval" => [a, b): a <= X < b
+ */
+print("Closed interval:")
+for index in 1...5 {
+   print("\(index) * 5 = \(index * 5)")
+}
+print("Semi open interval:")
+for index in 1..<5 {
+    print("\(index) * 5 = \(index * 5)")
+}
+
