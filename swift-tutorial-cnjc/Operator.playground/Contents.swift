@@ -63,7 +63,13 @@ print("!F => \(!F)");         // => true
 
 /* ------------------------------------ Bitwise Operator ------------------------------------ */
 /*
- Binary Level Operation
+ Binary Level Operation:
+ "&"  => and
+ "|"  => or
+ "^"  => xor(exclusive OR)
+ "~"  => negation
+ "<<" => left shift
+ ">>" => right shift
  */
 var p0 = 0;
 var q0 = 0;
@@ -89,14 +95,6 @@ print(p1 & q1); // => 1
 print(p1 | q1); // => 1
 print(p1 ^ q1); // => 0
 
-/*
- "&"  => and
- "|"  => or
- "^"  => xor(exclusive OR)
- "~"  => negation
- "<<" => left shift
- ">>" => right shift
- */
 var G = 60; // binary: 0011 1100
 var H = 13; // binary: 0000 1101
 print("G&H => \(G&H)"); // => 12 => binary: 0000 1100
@@ -175,3 +173,46 @@ for index in 1..<5 {
     print("\(index) * 5 = \(index * 5)")
 }
 
+
+
+/* ------------------------------------ Other Operator ------------------------------------ */
+/*
+ "Unary operation"   => add "-" before an Integer
+ "Binary operation"  => add "+" before an Integer
+ "Ternary operation" => condition ? X : Y
+ "Nullish coalescing operator" => [a "??" b] === [a != nil ? a! : b]
+ */
+var L = 1;
+var M = 2;
+var N = true;
+var O = false;
+print("-L => \(-L)");
+print("L + M => \(L + M)");
+print("Ternary Operator => \(N ? L : M )");
+print("Ternary Operator => \(O ? L : M )");
+
+var P:Int? = 0;
+var Q:Int? = nil;
+print("P ?? Q => \(P ?? 1)");
+print("P ?? Q => \(Q ?? 1)");
+
+
+/* ------------------------------------ Operator Precedence ------------------------------------ */
+/*
+ 1.  Bitwise Operator                                       => >> &<< &>> >>
+ 2.  Arithmetic Operator(multiplication/division/remainder) => &* % & * /
+ 3.  Arithmetic Operator(addition/subtraction)              => | &+ &- + -  ^
+ 4.  Interval Arithmetic Operator                           => ..< ...
+ 5.  is as
+ 6.  Nullish Coalescing Operator                            => ??
+ 7.  Comparison Operator                                    => != > < >= <= === ==
+ 8.  Logical Operator(and)                                  => &&
+ 9.  Logical Operator(or)                                   => ||
+ 10. ~>
+ 11. Ternary Operator                                       => ?:
+ 12. Arrow Function                                         => ()
+ 13. Assignment Operator                                    => |= %= /= &<<= &>>= &= *= >>= <<= ^= += -=
+ */
+var R = 0;
+R = 2 + 3 * 4 % 5;
+print("R => \(R)");
