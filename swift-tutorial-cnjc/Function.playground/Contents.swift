@@ -146,8 +146,44 @@ func funcJ(_ a: inout Int, _ b: inout Int) {
     b = temporaryA;
 }
 
-
 var x = 1;
 var y = 5;
 funcJ(&x, &y);
 print("x = \(x), y = \(y)");
+
+
+
+/* ------------------------------------ Function type and usage ------------------------------------ */
+func funcK(a: Int, b: Int) -> Int {
+    return a + b;
+}
+var funcL: (Int, Int) -> Int = funcK;
+print("funcL's result = \(funcL(40, 89))");
+
+
+
+/* ------------------------------------ Callback Function and Function Parameter ------------------------------------ */
+func funcM(a: Int, b: Int) -> Int {
+    return a + b;
+}
+var funcN: (Int, Int) -> Int = funcM;
+print("funcN's result = \(funcN(40, 89))");
+
+func funcO(funcN: (Int, Int) -> Int, a: Int, b: Int) {
+    print("funcO's result = \(funcN(1, 2))");
+}
+funcO(funcN: funcM, a: 10, b: 20);
+
+
+
+/* ------------------------------------ Nested Function ------------------------------------ */
+func funcP(_argument _parameter: Int) -> () -> Int {
+    var _temp = 0;
+    func funcQ() -> Int {
+        _temp -= _parameter;
+        return _temp;
+    }
+    return funcQ;
+}
+let funcR = funcP(_argument: 30);
+print(funcR());
