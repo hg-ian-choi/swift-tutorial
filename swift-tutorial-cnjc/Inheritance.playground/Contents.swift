@@ -29,11 +29,15 @@ class Info {
     var height: Double!
     var weight: Double!
     
-    init(_firstName: String, _lastName: String, _height: Double, _weight: Double ) {
-        self.firstName = _firstName
+    init(firstName: String, _lastName: String, _height: Double, _weight: Double ) {
+        self.firstName = firstName
         self.lastName = _lastName
         self.height = _height
         self.weight = _weight
+    }
+    
+    func getFullName() -> String {
+        return firstName + self.lastName
     }
 }
 let firstName = "Hello, "
@@ -41,9 +45,28 @@ let lastName = "World!"
 let height = 180.00
 let weight = 88.00
 
-let info = Info(_firstName: firstName, _lastName: lastName, _height: height, _weight: weight)
+let info = Info(firstName: firstName, _lastName: lastName, _height: height, _weight: weight)
 
 print(info.firstName) // => Hello,
 print(info.lastName)  // => World!
 print(info.height)    // => 180.0
 print(info.weight)    // => 88.0
+
+
+
+/* ------------------------------------ Subclassing ------------------------------------ */
+/*
+ Subclassing is the act of basing a new class on an existing class.
+ The subclass inherits characteristics from the existing class,
+ which you can then refine. You can also add new characteristics to the subclass.
+ */
+class SubInfo: Info {
+    init() {
+        super.init(firstName: "Hello, ", _lastName: "Swift!", _height: 188.0, _weight: 90.0)
+    }
+}
+let subInfo = SubInfo()
+print("full name => \(subInfo.getFullName())") // => Hello, Swift!
+
+
+
