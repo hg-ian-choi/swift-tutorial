@@ -77,3 +77,40 @@ struct fullNameB {
 }
 var nameB = fullNameB()
 print("full name = \(nameB.firstName + nameB.lastName)") // => full name = Hello, World!
+
+
+
+/* ------------------------------------ Customizing Initialization ------------------------------------ */
+/*
+ You can customize the initialization process with input parameters and optional property types,
+ or by assigning constant properties during initialization, as described in the following sections.
+ */
+/* Initialization Parameters */
+/*
+ You can provide initialization parameters as part of an initializer’s definition,
+ to define the types and names of values that customize the initialization process.
+ Initialization parameters have the same capabilities and syntax as function and method parameters.
+ */
+struct Rectangle {
+    var length: Double
+    var breadth: Double
+    var area: Double
+    
+    init(fromLength length: Double, fromBreadth breadth: Double) {
+        self.length = length
+        self.breadth = breadth
+        area = length * breadth
+    }
+    
+    init(fromLeng leng: Double, fromBread bread: Double) {
+        self.length = leng
+        self.breadth = bread
+        area = leng * bread
+    }
+}
+
+let ar = Rectangle(fromLength: 6, fromBreadth: 12)
+print("area is: \(ar.area)")
+
+let are = Rectangle(fromLeng: 36, fromBread: 12)
+print("area is: \(are.area)")
