@@ -114,3 +114,148 @@ print("area is: \(ar.area)")
 
 let are = Rectangle(fromLeng: 36, fromBread: 12)
 print("area is: \(are.area)")
+
+
+
+/* ------------------------------------ Parameter Names and Argument Labels ------------------------------------ */
+/*
+ As with function and method parameters, initialization parameters can have both a parameter name
+ for use within the initializer’s body and an argument label for use when calling the initializer.
+
+ However, initializers don’t have an identifying function name before their parentheses in the way
+ that functions and methods do. Therefore, the names and types of an initializer’s parameters play a
+ particularly important role in identifying which initializer should be called. Because of this,
+ Swift provides an automatic argument label for every parameter in an initializer if you don’t provide one.
+ */
+struct Color {
+    let red, green, blue: Double
+    init(red: Double, green: Double, blue: Double) {
+        self.red   = red
+        self.green = green
+        self.blue  = blue
+    }
+    init(white: Double) {
+        red   = white
+        green = white
+        blue  = white
+    }
+}
+
+// create a new Color instance (with 3 parameters)
+let magenta = Color(red: 1.0, green: 0.0, blue: 1.0)
+
+// create a new Color instance (with 1 parameter)
+let halfGray = Color(white: 0.5)
+
+//let veryGreen = Color(0.0, 1.0, 0.0) => ERROR: Missing argument labels 'red:green:blue:' in call
+
+
+
+/* ------------------------------------ Initializer Parameters Without Argument Labels ------------------------------------ */
+/*
+ If you don’t want to use an argument label for an initializer parameter, write an underscore (_)
+ instead of an explicit argument label for that parameter to override the default behavior.
+ */
+struct Celsius {
+    var temperatureInCelsius: Double
+    init(fromFahrenheit fahrenheit: Double) {
+        temperatureInCelsius = (fahrenheit - 32.0) / 1.8
+    }
+    init(fromKelvin kelvin: Double) {
+        temperatureInCelsius = kelvin - 273.15
+    }
+    init(_ celsius: Double) {
+        temperatureInCelsius = celsius
+    }
+}
+let bodyTemperature = Celsius(37.0)
+print(bodyTemperature.temperatureInCelsius); // => 37.0
+
+
+
+/* ------------------------------------ Optional Property Types ------------------------------------ */
+/*
+ If your custom type has a stored property that’s logically allowed to have “no value”—perhaps because its value
+ can’t be set during initialization, or because it’s allowed to have “no value” at some later point—declare the
+ property with an optional type. Properties of optional type are automatically initialized with a value of nil,
+ indicating that the property is deliberately intended to have “no value yet” during initialization.
+ */
+class SurveyQuestion {
+    var text: String
+    var response: String?
+    init(text: String) {
+        self.text = text
+    }
+    func ask() {
+        print(text)
+    }
+}
+let cheeseQuestion = SurveyQuestion(text: "Do you like cheese?")
+cheeseQuestion.ask() // => Do you like cheese?
+cheeseQuestion.response = "Yes, I do like cheese."
+
+
+
+/* ------------------------------------ Assigning Constant Properties During Initialization ------------------------------------ */
+/*
+ You can assign a value to a constant property at any point during initialization,
+ as long as it’s set to a definite value by the time initialization finishes.
+ Once a constant property is assigned a value, it can’t be further modified.
+ 
+ NOTE:
+    For class instances, a constant property can be modified during initialization only by the class that introduces it.
+    It can’t be modified by a subclass.
+ */
+class SurveyQuestion2 {
+    let text: String
+    var response: String?
+    init(text: String) {
+        self.text = text
+    }
+    func ask() {
+        print(text)
+    }
+}
+let beetsQuestion = SurveyQuestion2(text: "How about beets?")
+beetsQuestion.ask() // => How about beets?
+beetsQuestion.response = "I also like beets. (But not with cheese.)"
+
+
+
+/* ------------------------------------ Default Initializers ------------------------------------ */
+/*
+ Swift provides a default initializer for any structure or class that provides default
+ values for all of its properties and doesn’t provide at least one initializer itself.
+ The default initializer simply creates a new instance with all of its properties set to
+ their default values.
+ */
+class ShoppingListItem {
+    var name: String?
+    var quantity = 1
+    var purchased = false
+}
+var item = ShoppingListItem()
+
+
+
+/* ------------------------------------ Memberwise Initializers for Structure Types ------------------------------------ */
+/*
+ Structure types automatically receive a memberwise initializer if they don’t define any of
+ their own custom initializers. Unlike a default initializer, the structure receives a
+ memberwise initializer even if it has stored properties that don’t have default values.
+
+ The memberwise initializer is a shorthand way to initialize the member properties of new structure instances.
+ Initial values for the properties of the new instance can be passed to the memberwise initializer by name.
+ */
+struct Size {
+    var width = 0.0, height = 0.0 // => Auto Inject Double Type to "width" and "height"
+}
+let twoByTwo = Size(width: 2.0, height: 2.0)
+
+let zeroByTwo = Size(height: 2.0)
+print(zeroByTwo.width, zeroByTwo.height) // => 0.0, 2.0
+
+let zeroByZero = Size()
+print(zeroByZero.width, zeroByZero.height) // => 0.0, 0.0
+
+
