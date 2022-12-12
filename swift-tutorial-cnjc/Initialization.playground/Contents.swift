@@ -259,3 +259,71 @@ let zeroByZero = Size()
 print(zeroByZero.width, zeroByZero.height) // => 0.0, 0.0
 
 
+
+/* ------------------------------------ Initializer Delegation for Value Types ------------------------------------ */
+/*
+ Initializers can call other initializers to perform part of an instance’s initialization.
+ This process, known as initializer delegation, avoids duplicating code across multiple initializers.
+
+ The rules for how initializer delegation works, and for what forms of delegation are allowed, are different for value
+ types and class types. Value types (structures and enumerations) don’t support inheritance, and so their initializer
+ delegation process is relatively simple, because they can only delegate to another initializer that they provide themselves.
+ Classes, however, can inherit from other classes, as described in Inheritance. This means that classes have additional
+ responsibilities for ensuring that all stored properties they inherit are assigned a suitable value during initialization.
+ These responsibilities are described in Class Inheritance and Initialization below.
+
+ For value types, you use self.init to refer to other initializers from the same value type when writing your own custom initializers.
+ You can call self.init only from within an initializer.
+
+ Note that if you define a custom initializer for a value type, you will no longer have access to the default initializer
+ (or the memberwise initializer, if it’s a structure) for that type. This constraint prevents a situation in which additional
+ essential setup provided in a more complex initializer is accidentally circumvented by someone using one of the automatic initializers.
+ 
+ NOTE:
+    If you want your custom value type to be initializable with the default initializer and memberwise initializer,
+    and also with your own custom initializers, write your custom initializers in an extension rather than as part
+    of the value type’s original implementation. For more information, see Extensions.
+ */
+struct Size2 {
+    var width = 0.0, height = 0.0
+}
+struct Point2 {
+    var x = 0.0, y = 0.0
+}
+struct Rect2 {
+    var origin = Point2()
+    var size = Size2()
+    init() {}
+    init(origin: Point2, size: Size2) {
+        self.origin = origin
+        self.size = size
+    }
+    init(center: Point2, size: Size2) {
+        let originX = center.x - (size.width / 2)
+        let originY = center.y - (size.height / 2)
+        self.init(origin: Point2(x: originX, y: originY), size: size)
+    }
+}
+
+// 1. init()
+let basicRect = Rect2()
+print(basicRect.origin, basicRect.size) // => Point2(x: 0.0, y: 0.0) Size2(width: 0.0, height: 0.0)
+
+// 2. init(origin: Point2, size: Size2)
+let originRect = Rect2(origin: Point2(x: 2.0, y: 2.0), size: Size2(width: 5.0, height: 5.0))
+print(originRect.origin, originRect.size); // => Point2(x: 2.0, y: 2.0) Size2(width: 5.0, height: 5.0)
+
+// 3. init(center: Point2, size: Size2)
+let centerRect = Rect2(center: Point2(x: 4.0, y: 4.0), size: Size2(width: 3.0, height: 3.0))
+print(centerRect.origin, centerRect.size); // => Point2(x: 2.5, y: 2.5) Size2(width: 3.0, height: 3.0)
+
+
+
+/* ------------------------------------ Class Inheritance and Initialization ------------------------------------ */
+/*
+ All of a class’s stored properties—including any properties the class inherits
+ from its superclass—must be assigned an initial value during initialization.
+
+ Swift defines two kinds of initializers for class types to help ensure all stored properties
+ receive an initial value. These are known as designated initializers and convenience initializers.
+ */
