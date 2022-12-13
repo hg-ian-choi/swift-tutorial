@@ -61,7 +61,7 @@ var reference2: Person?
 var reference3: Person?
 
 // create a new Person instance and assign it to one of these three variables
-reference1 = Person(name: "Ian Choi") // => Ian Choi is being initialized
+reference1 = Person(name: "(Ian Choi)1") // => (Ian Choi)1 is being initialized
 
 // assign the same Person instance to two more variables, two more strong references to that instance are established
 reference2 = reference1
@@ -72,4 +72,144 @@ reference1 = nil
 reference2 = nil
 
 // ARC doesn’t deallocate the Person instance until the third and final strong reference is broken, at which point it’s clear that you are no longer using the Person instance
-reference3 = nil // => Ian Choi is being deinitialized
+reference3 = nil // => (Ian Choi)1 is being deinitialized
+
+
+
+/* ------------------------------------ Strong Reference Cycles Between Class Instances ------------------------------------ */
+/*
+ In the examples above, ARC is able to track the number of references to the new Person
+ instance you create and to deallocate that Person instance when it’s no longer needed.
+
+ However, it’s possible to write code in which an instance of a class never gets to a point where it has
+ zero strong references. This can happen if two class instances hold a strong reference to each other,
+ such that each instance keeps the other alive. This is known as a strong reference cycle.
+ */
+class Person2 {
+    let name: String
+    init(name: String) { self.name = name }
+    var apartment: Apartment2?
+    deinit { print("\(name) is being deinitialized") }
+}
+
+class Apartment2 {
+    let unit: String
+    init(unit: String) { self.unit = unit }
+    var tenant: Person2?
+    deinit { print("Apartment \(unit) is being deinitialized") }
+}
+
+// two variables have an initial value of nil
+var ian2: Person2?
+var chois2: Apartment2?
+
+// create a specific Person instance and Apartment instance and assign these new instances to the ian and chois variables
+ian2 = Person2(name: "(Ian Choi)2")
+chois2 = Apartment2(unit: "(Chois)2")
+
+
+// link the two instances together so that the person has an apartment, and the apartment has a tenant. Note that an exclamation point (!) is used to unwrap and access the instances stored inside the ian and chois optional variables, so that the properties of those instances can be set
+ian2!.apartment = chois2
+chois2!.tenant = ian2
+
+// break the strong references held by the ian and chois variables, the reference counts don’t drop to zero, and the instances aren’t deallocated by ARC
+// Note that neither deinitializer was called when you set these two variables to nil. The strong reference cycle prevents the Person and Apartment instances from ever being deallocated, causing a memory leak in your app.
+ian2 = nil
+chois2 = nil
+
+
+
+/* ------------------------------------ Resolving Strong Reference Cycles Between Class Instances ------------------------------------ */
+/*
+ Swift provides two ways to resolve strong reference cycles when you work with properties of class type:
+    weak references and unowned references.
+ 
+ Weak and unowned references enable one instance in a reference cycle to refer to the other instance without keeping
+ a strong hold on it. The instances can then refer to each other without creating a strong reference cycle.
+
+ Use a weak reference when the other instance has a shorter lifetime—that is, when the other instance can be deallocated first.
+ In the Apartment example above, it’s appropriate for an apartment to be able to have no tenant at some point in its lifetime,
+ and so a weak reference is an appropriate way to break the reference cycle in this case. In contrast, use an unowned reference
+ when the other instance has the same lifetime or a longer lifetime.
+ */
+
+
+
+/* ------------------------------------ Weak References ------------------------------------ */
+/*
+ A weak reference is a reference that doesn’t keep a strong hold on the instance it refers to,
+ and so doesn’t stop ARC from disposing of the referenced instance.
+ This behavior prevents the reference from becoming part of a strong reference cycle.
+ You indicate a weak reference by placing the weak keyword before a property or variable declaration.
+ */
+class Person3 {
+    let name: String
+    init(name: String) { self.name = name }
+    var apartment: Apartment3?
+    deinit { print("\(name) is being deinitialized") }
+}
+
+class Apartment3 {
+    let unit: String
+    init(unit: String) { self.unit = unit }
+    weak var tenant: Person3?
+    deinit { print("Apartment \(unit) is being deinitialized") }
+}
+
+// The strong references from the two variables (ian and chois) and the links between the two instances are created as before:
+var ian3: Person3?
+var chois3: Apartment3?
+
+ian3 = Person3(name: "(Ian Choi)3")
+chois3 = Apartment3(unit: "(Chois)3")
+
+ian3!.apartment = chois3
+chois3!.tenant = ian3
+
+ian3 = nil // => (Ian Choi)3 is being deinitialized
+chois3 = nil // => Apartment (Chois)3 is being deinitialized
+
+
+
+/* ------------------------------------ Unowned References ------------------------------------ */
+/*
+ Like a weak reference, an unowned reference doesn’t keep a strong hold on the instance it refers to.
+ Unlike a weak reference, however, an unowned reference is used when the other instance has the same
+ lifetime or a longer lifetime. You indicate an unowned reference by placing the unowned keyword
+ before a property or variable declaration.
+
+ Unlike a weak reference, an unowned reference is expected to always have a value.
+ As a result, marking a value as unowned doesn’t make it optional,
+ and ARC never sets an unowned reference’s value to nil.
+ 
+ IMPORTANT:
+    Use an unowned reference only when you are sure that the reference always refers to an instance that hasn’t been deallocated.
+    If you try to access the value of an unowned reference after that instance has been deallocated, you’ll get a runtime error.
+ */
+class Customer4 {
+    let name: String
+    var card: CreditCard4?
+    init(name: String) {
+        self.name = name
+    }
+    deinit { print("\(name) is being deinitialized") }
+}
+
+class CreditCard4 {
+    let number: UInt64
+    unowned let customer: Customer4
+    init(number: UInt64, customer: Customer4) {
+        self.number = number
+        self.customer = customer
+    }
+    deinit { print("Card #\(number) is being deinitialized") }
+}
+
+var ian4: Customer4?
+
+ian4 = Customer4(name: "(Ian Choi)4")
+ian4!.card = CreditCard4(number: 4444_4444_4444_4444, customer: ian4!)
+
+ian4 = nil
+// => (Ian Choi)4 is being deinitialized
+// => Card #4444444444444444 is being deinitialized
