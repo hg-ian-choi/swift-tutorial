@@ -213,3 +213,152 @@ ian4!.card = CreditCard4(number: 4444_4444_4444_4444, customer: ian4!)
 ian4 = nil
 // => (Ian Choi)4 is being deinitialized
 // => Card #4444444444444444 is being deinitialized
+
+
+
+/* ------------------------------------ Unowned Optional References ------------------------------------ */
+/*
+ You can mark an optional reference to a class as unowned. In terms of the ARC ownership model,
+ an unowned optional reference and a weak reference can both be used in the same contexts.
+ The difference is that when you use an unowned optional reference, you’re responsible for
+ making sure it always refers to a valid object or is set to nil.
+ */
+class Department {
+    var name: String
+    var courses: [Course]
+    init(name: String) {
+        self.name = name
+        self.courses = []
+    }
+}
+
+class Course {
+    var name: String
+    unowned var department: Department
+    unowned var nextCourse: Course?
+    init(name: String, in department: Department) {
+        self.name = name
+        self.department = department
+        self.nextCourse = nil
+    }
+}
+let department = Department(name: "Horticulture")
+
+let intro = Course(name: "Survey of Plants", in: department)
+let intermediate = Course(name: "Growing Common Herbs", in: department)
+let advanced = Course(name: "Caring for Tropical Plants", in: department)
+
+intro.nextCourse = intermediate
+intermediate.nextCourse = advanced
+department.courses = [intro, intermediate, advanced]
+
+
+
+/* ------------------------------------ Unowned References and Implicitly Unwrapped Optional Properties ------------------------------------ */
+class Country {
+    let name: String
+    var capitalCity: City!
+    init(name: String, capitalName: String) {
+        self.name = name
+        self.capitalCity = City(name: capitalName, country: self)
+    }
+}
+
+class City {
+    let name: String
+    unowned let country: Country
+    init(name: String, country: Country) {
+        self.name = name
+        self.country = country
+    }
+}
+var country = Country(name: "Canada", capitalName: "Ottawa")
+print("\(country.name)'s capital city is called \(country.capitalCity.name)")
+// Prints "Canada's capital city is called Ottawa"
+
+
+/* ------------------------------------ Strong Reference Cycles for Closures ------------------------------------ */
+class HTMLElement {
+
+    let name: String
+    let text: String?
+
+    lazy var asHTML: () -> String = {
+        if let text = self.text {
+            return "<\(self.name)>\(text)</\(self.name)>"
+        } else {
+            return "<\(self.name) />"
+        }
+    }
+
+    init(name: String, text: String? = nil) {
+        self.name = name
+        self.text = text
+    }
+
+    deinit {
+        print("\(name) is being deinitialized")
+    }
+
+}
+
+let heading = HTMLElement(name: "h1")
+let defaultText = "some default text"
+heading.asHTML = {
+    return "<\(heading.name)>\(heading.text ?? defaultText)</\(heading.name)>"
+}
+print(heading.asHTML())
+// Prints "<h1>some default text</h1>"
+
+var paragraph: HTMLElement? = HTMLElement(name: "p", text: "hello, world")
+print(paragraph!.asHTML())
+// Prints "<p>hello, world</p>"
+
+paragraph = nil
+
+
+
+/* ------------------------------------ Weak and Unowned References ------------------------------------ */
+/*
+ Define a capture in a closure as an unowned reference when the closure and the instance it
+ captures will always refer to each other, and will always be deallocated at the same time.
+
+ Conversely, define a capture as a weak reference when the captured reference may become nil at some point in the future.
+ Weak references are always of an optional type, and automatically become nil when the instance they reference is deallocated.
+ This enables you to check for their existence within the closure’s body.
+ 
+ NOTE:
+    If the captured reference will never become nil,
+    it should always be captured as an unowned reference,
+    rather than a weak reference.
+ */
+class HTMLElement2 {
+
+    let name: String
+    let text: String?
+
+    lazy var asHTML: () -> String = {
+        [unowned self] in
+        if let text = self.text {
+            return "<\(self.name)>\(text)</\(self.name)>"
+        } else {
+            return "<\(self.name) />"
+        }
+    }
+
+    init(name: String, text: String? = nil) {
+        self.name = name
+        self.text = text
+    }
+
+    deinit {
+        print("\(name) is being deinitialized")
+    }
+
+}
+var paragraph2: HTMLElement? = HTMLElement(name: "p", text: "hello, world")
+print(paragraph2!.asHTML())
+// Prints "<p>hello, world</p>"
+
+paragraph = nil
+// Prints "p is being deinitialized"
