@@ -106,3 +106,139 @@ class Address2 {
 }
 
 
+
+/* ------------------------------------ Accessing Properties Through Optional Chaining ------------------------------------ */
+/*
+ As demonstrated in Optional Chaining as an Alternative to Forced Unwrapping,
+ you can use optional chaining to access a property on an optional value,
+ and to check if that property access is successful.
+ */
+class Person3 {
+    var residence: Residence3?
+}
+
+class Residence3 {
+    var rooms: [Room3] = []
+    var numberOfRooms: Int {
+        return rooms.count
+    }
+    subscript(i: Int) -> Room3 {
+        get {
+            return rooms[i]
+        }
+        set {
+            rooms[i] = newValue
+        }
+    }
+    func printNumberOfRooms() {
+        print("The number of rooms is \(numberOfRooms)")
+    }
+    var address: Address3?
+}
+
+class Room3 {
+    let name: String
+    init(name: String) { self.name = name }
+}
+
+class Address3 {
+    var buildingName: String?
+    var buildingNumber: String?
+    var street: String?
+    func buildingIdentifier() -> String? {
+        if let buildingNumber = buildingNumber, let street = street {
+            return "\(buildingNumber) \(street)"
+        } else if buildingName != nil {
+            return buildingName
+        } else {
+            return nil
+        }
+    }
+}
+
+let ian3 = Person3()
+
+if let roomCount = ian3.residence?.numberOfRooms {
+    print("Ian3's residence has \(roomCount) room(s).")
+} else {
+    print("Unable to retrieve the number of rooms.") // => Unable to retrieve the number of rooms.
+}
+
+let someAddress = Address3()
+someAddress.buildingNumber = "29"
+someAddress.street = "Acacia Road"
+ian3.residence?.address = someAddress
+
+func createAddress3() -> Address3 {
+    print("Function was called.")
+
+    let someAddress = Address3()
+    someAddress.buildingNumber = "29"
+    someAddress.street = "Acacia Road"
+
+    return someAddress
+}
+ian3.residence?.address = createAddress3()
+
+
+
+/* ------------------------------------ Calling Methods Through Optional Chaining ------------------------------------ */
+/*
+ You can use optional chaining to call a method on an optional value,
+ and to check whether that method call is successful.
+ You can do this even if that method doesn’t define a return value.
+ */
+if ian3.residence?.printNumberOfRooms() != nil {
+    print("It was possible to print the number of rooms.")
+} else {
+    print("It was not possible to print the number of rooms.") // => It was not possible to print the number of rooms.
+}
+
+if (ian3.residence?.address = someAddress) != nil {
+    print("It was possible to set the address.") // => It was not possible to set the address.
+} else {
+    print("It was not possible to set the address.")
+}
+
+
+
+/* ------------------------------------ Accessing Subscripts Through Optional Chaining ------------------------------------ */
+/*
+ You can use optional chaining to try to retrieve and set a value from a subscript on an optional value,
+ and to check whether that subscript call is successful.
+ 
+ NOTE:
+    When you access a subscript on an optional value through optional chaining,
+    you place the question mark before the subscript’s brackets, not after.
+    The optional chaining question mark always follows immediately after the part of the expression that’s optional.
+ */
+if let firstRoomName = ian3.residence?[0].name {
+    print("The first room name is \(firstRoomName).")
+} else {
+    print("Unable to retrieve the first room name.")// => Unable to retrieve the first room name.
+}
+
+ian3.residence?[0] = Room3(name: "Bathroom")
+
+let ian3sHouse = Residence3()
+ian3sHouse.rooms.append(Room3(name: "Living Room"))
+ian3sHouse.rooms.append(Room3(name: "Kitchen"))
+ian3.residence = ian3sHouse
+
+if let firstRoomName = ian3.residence?[0].name {
+    print("The first room name is \(firstRoomName).") // => The first room name is Living Room.
+} else {
+    print("Unable to retrieve the first room name.")
+}
+
+/*
+ Accessing Subscripts of Optional Type:
+    If a subscript returns a value of optional type—such as the key
+    subscript of Swift’s Dictionary type—place a question mark after
+    the subscript’s closing bracket to chain on its optional return value:
+ */
+var testScores = ["Dave": [86, 82, 84], "Bev": [79, 94, 81]]
+testScores["Dave"]?[0] = 91
+testScores["Bev"]?[0] += 1
+testScores["Brian"]?[0] = 72
+// the "Dave" array is now [91, 82, 84] and the "Bev" array is now [80, 94, 81]
