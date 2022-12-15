@@ -242,3 +242,57 @@ testScores["Dave"]?[0] = 91
 testScores["Bev"]?[0] += 1
 testScores["Brian"]?[0] = 72
 // the "Dave" array is now [91, 82, 84] and the "Bev" array is now [80, 94, 81]
+
+
+
+/* ------------------------------------ Linking Multiple Levels of Chaining ------------------------------------ */
+/*
+ You can link together multiple levels of optional chaining to drill down to properties,
+ methods, and subscripts deeper within a model.
+ However, multiple levels of optional chaining don’t add more levels of optionality to the returned value.
+ 
+ To put it another way:
+    1. If the type you are trying to retrieve isn’t optional, it will become optional because of the optional chaining.
+    2. If the type you are trying to retrieve is already optional, it will not become more optional because of the chaining.
+ 
+ Therefore:
+    1. If you try to retrieve an Int value through optional chaining, an Int?
+       is always returned, no matter how many levels of chaining are used.
+    2. Similarly, if you try to retrieve an Int? value through optional chaining, an Int?
+       is always returned, no matter how many levels of chaining are used.
+ */
+if let ian3sStreet = ian3.residence?.address?.street {
+    print("Ian3's street name is \(ian3sStreet).")
+} else {
+    print("Unable to retrieve the address.") // => Unable to retrieve the address.
+}
+
+let ian3sAddress = Address3()
+ian3sAddress.buildingName = "The Larches"
+ian3sAddress.street = "Laurel Street"
+ian3.residence?.address = ian3sAddress
+
+if let ian3sStreet = ian3.residence?.address?.street {
+    print("Ian3's street name is \(ian3sStreet).") // => Ian3's street name is Laurel Street.
+} else {
+    print("Unable to retrieve the address.")
+}
+
+
+/* ------------------------------------ Chaining on Methods with Optional Return Values ------------------------------------ */
+/*
+ The previous example shows how to retrieve the value of a property of optional type through optional chaining.
+ You can also use optional chaining to call a method that returns a value of optional type,
+ and to chain on that method’s return value if needed.
+ */
+if let buildingIdentifier = ian3.residence?.address?.buildingIdentifier() {
+    print("Ian3's building identifier is \(buildingIdentifier).") // => Ian3's building identifier is The Larches.
+}
+
+if let beginsWithThe = ian3.residence?.address?.buildingIdentifier()?.hasPrefix("The") {
+    if beginsWithThe {
+        print("Ian3's building identifier begins with \"The\".") // => Ian3's building identifier begins with "The".
+    } else {
+        print("Ian3's building identifier doesn't begin with \"The\".")
+    }
+}
