@@ -18,6 +18,7 @@ import Cocoa
 /*------------------------------------ Protocol Syntax ------------------------------------ */
 /*
  You define protocols in a very similar way to classes, structures, and enumerations:
+ 
      protocol SomeProtocol {
          // protocol definition goes here
      }
@@ -25,13 +26,137 @@ import Cocoa
 /*
  Custom types state that they adopt a particular protocol by placing the protocol’s name after the type’s name,
  separated by a colon, as part of their definition. Multiple protocols can be listed, and are separated by commas:
+ 
      struct SomeStructure: FirstProtocol, AnotherProtocol {
          // structure definition goes here
      }
  */
 /*
  If a class has a superclass, list the superclass name before any protocols it adopts, followed by a comma:
+ 
      class SomeClass: SomeSuperclass, FirstProtocol, AnotherProtocol {
          // class definition goes here
      }
  */
+
+
+
+/*------------------------------------ Property Requirements ------------------------------------ */
+/*
+ A protocol can require any conforming type to provide an instance property or type property with
+ a particular name and type. The protocol doesn’t specify whether the property should be a stored
+ property or a computed property—it only specifies the required property name and type.
+ The protocol also specifies whether each property must be gettable or gettable and settable.
+
+ If a protocol requires a property to be gettable and settable, that property requirement
+ can’t be fulfilled by a constant stored property or a read-only computed property.
+ If the protocol only requires a property to be gettable, the requirement can be satisfied by any kind of property,
+ and it’s valid for the property to be also settable if this is useful for your own code.
+
+ Property requirements are always declared as variable properties, prefixed with the var keyword.
+ Gettable and settable properties are indicated by writing { get set } after their type declaration,
+ and gettable properties are indicated by writing { get }.
+ 
+    protocol SomeProtocol {
+        var mustBeSettable: Int { get set }
+        var doesNotNeedToBeSettable: Int { get }
+    }
+
+    protocol AnotherProtocol {
+        static var someTypeProperty: Int { get set }
+    }
+ */
+protocol FullyNamed {
+    var fullName: String { get }
+}
+
+struct Person: FullyNamed {
+    var fullName: String
+}
+let ian = Person(fullName: "Ian Choi")
+print("ian.fullName is \(ian.fullName)") // => ian.fullName is Ian Choi
+
+
+class Starship: FullyNamed {
+    var prefix: String?
+    var name: String
+    init(name: String, prefix: String? = nil) {
+        self.name = name
+        self.prefix = prefix
+    }
+    var fullName: String {
+        return (prefix != nil ? prefix! + " " : "") + name
+    }
+}
+var ncc1701 = Starship(name: "Enterprise", prefix: "USS")
+print("ncc1701.fullName is \(ncc1701.fullName)") // => ncc1701.fullName is USS Enterprise
+
+
+
+/*------------------------------------ Method Requirements ------------------------------------ */
+/*
+ Protocols can require specific instance methods and type methods to be implemented by conforming types.
+ These methods are written as part of the protocol’s definition in exactly the same way as for normal instance
+ and type methods, but without curly braces or a method body. Variadic parameters are allowed, subject to the same rules
+ as for normal methods. Default values, however, can’t be specified for method parameters within a protocol’s definition.
+ 
+     protocol SomeProtocol {
+         static func someTypeMethod()
+     }
+ */
+protocol RandomNumberGenerator {
+    func random() -> Double
+}
+
+class LinearCongruentialGenerator: RandomNumberGenerator {
+    var lastRandom = 42.0
+    let m = 139968.0
+    let a = 3877.0
+    let c = 29573.0
+    func random() -> Double {
+        lastRandom = ((lastRandom * a + c)
+            .truncatingRemainder(dividingBy:m))
+        return lastRandom / m
+    }
+}
+let generator = LinearCongruentialGenerator()
+print("Here's a random number: \(generator.random())") // => Here's a random number: 0.3746499199817101
+print("And another one: \(generator.random())") // => And another one: 0.729023776863283
+
+
+
+/*------------------------------------ Mutating Method Requirements ------------------------------------ */
+/*
+ It’s sometimes necessary for a method to modify (or mutate) the instance it belongs to.
+ For instance methods on value types (that is, structures and enumerations) you place
+ the mutating keyword before a method’s func keyword to indicate that the method is
+ allowed to modify the instance it belongs to and any properties of that instance.
+ This process is described in Modifying Value Types from Within Instance Methods.
+
+ If you define a protocol instance method requirement that’s intended to mutate instances of any type
+ that adopts the protocol, mark the method with the mutating keyword as part of the protocol’s definition.
+ This enables structures and enumerations to adopt the protocol and satisfy that method requirement.
+ 
+ NOTE:
+    If you mark a protocol instance method requirement as mutating,
+    you don’t need to write the mutating keyword when writing an implementation of that method for a class.
+    The mutating keyword is only used by structures and enumerations.
+ */
+protocol Togglable {
+    mutating func toggle()
+}
+
+enum OnOffSwitch: Togglable {
+    case off, on
+    mutating func toggle() {
+        switch self {
+        case .off:
+            self = .on
+        case .on:
+            self = .off
+        }
+    }
+}
+var lightSwitch = OnOffSwitch.off
+lightSwitch.toggle()
+print("lightSwitch is now equal to .\(lightSwitch)") // => lightSwitch is now equal to .on
